@@ -31,4 +31,18 @@ data LispVal
 
 data IFunc = IFunc { fn :: [LispVal] -> Eval LispVal }
 
+instance Show LispVal where
+  show = T.unpack . showVal
 
+showVal :: LispVal -> T.Text
+showVal val =
+  case val of
+    (Atom atom) -> atom
+    (String txt) -> T.concat ["\"", txt, "\""]
+    (Number num) -> T.pack $ show num
+    (Bool True) -> "#t"
+    (Bool False) -> "#f"
+    Nil -> "Nil"
+    (List contents) -> T.concat ["(", T.unwords $ showVal <$> contents, ")"]
+    (Fun _ ) -> "(internal function)"
+    (Lambda _ _) -> "(lambda function)"
